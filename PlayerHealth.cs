@@ -8,6 +8,10 @@ public class PlayerHealth : MonoBehaviour
 {
     private GameManager GameM;
     private PlayerController PlCon;
+    private mikanController mikanCon;
+
+
+
 
     [SerializeField] private float PlayerHp,knockBackPower;//PlayerのHp,ノックバックする力
 
@@ -59,6 +63,7 @@ public class PlayerHealth : MonoBehaviour
     {
         PlCon = GetComponent<PlayerController>();
         GameM = GameObject.Find("GameManager").GetComponent<GameManager>();
+
         //SpriteRenderer格納
         sp = GetComponent<SpriteRenderer>();
         Hpslider = GameObject.Find("PlayerSlider").GetComponent<Slider>();
@@ -114,7 +119,7 @@ public class PlayerHealth : MonoBehaviour
             if (state == PlayerState.NOMAL)
             {
                 knockBack();
-                PlayerHp -=GameM.MikanAttackD;
+                PlayerHp -= GameM.PlyerAttckD;
                 state = PlayerState.DAMAGED;
                 //コルーチンを開始
                 StartCoroutine(_hit());
@@ -136,7 +141,7 @@ public class PlayerHealth : MonoBehaviour
 
             if (state == PlayerState.NOMAL)
             {
-                PlayerHp -= GameM.MikanAttackD;
+                PlayerHp -= mikanCon.MikanAttackD;
                 state = PlayerState.DAMAGED;
                 //コルーチンを開始
                 StartCoroutine(_hit());

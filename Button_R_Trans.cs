@@ -5,13 +5,13 @@ using UnityEngine;
 public class Button_R_Trans : MonoBehaviour
 {
     private Button_R_Canvas CanvasScripts;
-    // Start is called before the first frame update
+    
     void Start()
     {
         CanvasScripts = transform.root.gameObject.GetComponent<Button_R_Canvas>();
     }
 
-    // Update is called once per frame
+    
     void Update()
     {
 

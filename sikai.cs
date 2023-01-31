@@ -4,16 +4,12 @@ using UnityEngine;
 
 public class sikai : MonoBehaviour
 {
-    GameObject Root;
-    Vector2 PositionRoot, PositionFormarrRoot;
+    
+    public bool ColliderTrigger { get; private set; }
 
-    [SerializeField] GameObject player;
-    public bool ColliderTrigger{ get; set; }
     // Start is called before the first frame update
     void Start()
     {
-        Root = transform.root.gameObject;
-        transform.position = Root.transform.position;
         ColliderTrigger = false;
     }
 

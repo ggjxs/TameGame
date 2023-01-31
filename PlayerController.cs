@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
- 
+
 
 public class PlayerController : MonoBehaviour
 {
@@ -9,15 +9,14 @@ public class PlayerController : MonoBehaviour
     public float HoriGet { get; private set; } = 1;
     public int PlayerLevel { get; private set; } = 1;
     public float PlayerAtD { get; private set; }
-    
+
     public float PlayerExp { get; private set; }
     public float PlayerNextExp { get; private set; }
     public float AttackHori { get; private set; }
 
-
-
     public static PlayerController instance;
 
+    private Button_R_Player ButtonPlayer;
     private GameManager GameM;
 
     [SerializeField] private string FloorName = "Floor";//床のtagの名前
@@ -25,7 +24,13 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D rd;
     private float Hori; //Horizontal
 
-    [SerializeField] private float speed,AtReach;//移動速度、攻撃のリーチ
+    private bool MoveButton = false;
+
+    [SerializeField] private float MaxTapTimer;
+    private float TapTimer; //タップ開始からの累積時間
+    private int TapCount;
+
+    [SerializeField] private float speed, Runspeed, AtReach;//移動速度、ダッシュスピード、攻撃のリーチ
 
     [SerializeField] private float NextExp, LevelUpAttackD;//次のレベルアップまでの経験値、レベルアップした時に上がる攻撃力
 
@@ -33,9 +38,11 @@ public class PlayerController : MonoBehaviour
 
     private float AttackTimer;//攻撃できるようになるまでの時間の計算用変数
 
-    [SerializeReference]private GameObject AttackgameObject;//攻撃判定のgameObject
+    [SerializeReference] private GameObject AttackgameObject;//攻撃判定のgameObject
 
-     //junp
+
+
+    //ジャンプ関連
     private float JunpTimer;  //ジャンプの現在の継続時間
     private float JunpAfterTimer;
     private bool JunpTrigger;
@@ -45,7 +52,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float JunpPawer;     //ジャンプの速さ
     [SerializeField] private float JunpLastPawer;
 
-    [SerializeField]private float AttackD;//playerの攻撃力
+
+
+    [SerializeField] private float AttackD;//playerの攻撃力
 
     private Animator anim = null;
 
@@ -63,6 +72,7 @@ public class PlayerController : MonoBehaviour
             Destroy(gameObject);
         }
         GameM = GameObject.Find("GameManager").GetComponent<GameManager>();
+        ButtonPlayer = GetComponent<Button_R_Player>();
         anim = GetComponent<Animator>();
         rd = GetComponent<Rigidbody2D>();
         PlayerAtD = AttackD;
@@ -70,30 +80,52 @@ public class PlayerController : MonoBehaviour
     }
 
     void Start()
-    {      
+    {
         PositionGet = rd.position;
         transform.rotation = new Quaternion(0.0f, 180.0f, 0.0f, 0.0f);//右向きにする
-        
+
     }
 
     void Update()
     {
-        
+        if (ButtonPlayer.TimeStop == false)
+        {
+            Hori = Input.GetAxisRaw("Horizontal");
 
-        Hori = Input.GetAxisRaw("Horizontal");
+            if (Hori != 0 && Hori != HoriGet) HoriGet = Hori;
 
-        if (Hori != 0 && Hori != HoriGet) HoriGet = Hori;
+            if (Input.GetMouseButtonDown(0))
+                Attack();
 
-        if (Input.GetMouseButtonDown(0))
-            Attack();
+            if (MoveButton)
+                TapTimer += Time.deltaTime;
 
 
-        if (Input.GetAxisRaw("Jump") == 1) anim.SetBool("jump", true);
+            if (Input.GetAxisRaw("Jump") == 1) anim.SetBool("jump", true);
 
-        if (Input.GetKey(KeyCode.Space) == false && JunpTrigger == true) JunpAfterTrigger = true;
-        if (Input.GetKey(KeyCode.Space)) JunpTrigger = true;
+            if (Input.GetKey(KeyCode.Space) == false && JunpTrigger == true) JunpAfterTrigger = true;
+            if (Input.GetKey(KeyCode.Space)) JunpTrigger = true;
 
-        if (GameM.PlayerExp >= GameM.PlayerNextExp) LevelUp();//レベルアップ
+            if (GameM.PlayerExp >= GameM.PlayerNextExp) LevelUp();//レベルアップ
+
+            if (TapTimer < MaxTapTimer)
+            {
+                if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.D))
+                {
+                    MoveButton = true;
+                    TapCount++;
+                    Debug.Log(TapCount);
+                }
+            }
+            else if (Hori == 0) 
+            {
+                TapCount = 0;
+                TapTimer = 0.0f;
+            }
+
+            
+
+        }  
     }
 
     private void FixedUpdate()
@@ -110,16 +142,22 @@ public class PlayerController : MonoBehaviour
 
         AttackTimer += Time.deltaTime;//攻撃のクールダウンの計算
 
-        
+
     }
-    
+
     private void PlayerMove()//プレイヤーの移動
     {
         if (Hori != 0)
         {
             //移動入力があるとき
 
-            rd.velocity = new Vector2(speed * Hori, rd.velocity.y);
+
+            if (TapCount <= 1)
+                rd.velocity = new Vector2(speed * Hori, rd.velocity.y);
+            else if (TapCount >= 2)
+                rd.velocity = new Vector2(Runspeed * Hori, rd.velocity.y);
+
+
             if (Hori > 0)
                 transform.rotation = new Quaternion(0.0f, 180.0f, 0.0f, 0.0f); //向きを変更する
             else if (Hori < 0)
@@ -132,8 +170,10 @@ public class PlayerController : MonoBehaviour
                 anim.SetBool("wind", true);
             }
         }
+        else if (TapCount >= 2) 
+            TapCount = 0;
         else
-            anim.SetBool("walk", false);           
+            anim.SetBool("walk", false);
     }
 
     private void Attack()//プレイヤーの攻撃
@@ -145,21 +185,21 @@ public class PlayerController : MonoBehaviour
                 if (AttackHori == 0)
                 {
                     Instantiate(AttackgameObject, new Vector3(transform.position.x + AtReach, transform.position.y, transform.position.z), new Quaternion(0.0f, 180.0f, 0.0f, 0.0f));
-                    
-                }                                                                       
+
+                }
             }
             if (AttackHori > 0)
             {
                 Instantiate(AttackgameObject, new Vector3(transform.position.x + AtReach, transform.position.y, transform.position.z), new Quaternion(0.0f, 180.0f, 0.0f, 0.0f));
-                
+
             }
             else if (AttackHori < 0)
             {
                 Instantiate(AttackgameObject, new Vector3(transform.position.x - AtReach, transform.position.y, transform.position.z), new Quaternion(0.0f, 0.0f, 0.0f, 0.0f));
-            } 
+            }
             AttackTimer = 0;
         }
-               
+
     }
 
     void Freeze()
@@ -169,18 +209,18 @@ public class PlayerController : MonoBehaviour
             anim.SetBool("frieze", true);
         }
     }
-    
+
     void PlayerJunp() //プレイヤーのジャンプ
     {
-        
+
         JunpTimer += Time.deltaTime;
         rd.velocity = new Vector3(rd.velocity.x, JunpPawer, 0);
-        if (JunpAfterTrigger && JunpAfterTimer <= JunpAfterTime) 
+        if (JunpAfterTrigger && JunpAfterTimer <= JunpAfterTime)
         {
             JunpAfterTimer += Time.deltaTime;
             new Vector3(rd.velocity.x, JunpLastPawer, 0);
         }
-             
+
     }
     private void LevelUp()
     {

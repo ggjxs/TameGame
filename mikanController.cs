@@ -9,17 +9,18 @@ public class mikanController : MonoBehaviour
 
     private GameManager GameM;
 
-    [SerializeField] private string Floor = "Floor", Player = "Player";
-
     private Rigidbody2D Rbody;
 
-    [SerializeField] private float JunpPawer, AttackD,Speed, WalkRange;//ジャンプ力、攻撃力、探索距離
+    [SerializeField] private string Floor = "Floor", Player = "Player";
+
+    [SerializeField] private float JunpPawer, AttackD, Speed, WalkRange;//ジャンプ力、攻撃力、探索距離
 
     [SerializeField] private GameObject Target;
 
     private float StartPos;
+    private float Timer;
 
-    public enum EnemyState
+    private enum EnemyState
     {
         Walk,
         Wait,
@@ -34,7 +35,7 @@ public class mikanController : MonoBehaviour
         MikanAttackD = AttackD;
         Rbody = GetComponent<Rigidbody2D>();
         GameM = GameObject.Find("GameManager").GetComponent<GameManager>();
-        
+
     }
     void Start()
     {
@@ -46,11 +47,12 @@ public class mikanController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
         Walk();
         Wait();
         Chase();
 
+        Timer += Time.deltaTime;
     }
     private void OnCollisionEnter2D(Collision2D collision)
     {
@@ -63,7 +65,14 @@ public class mikanController : MonoBehaviour
         if (collision.tag == Player)
         {
             state = EnemyState.Chase;
-        }        
+        }
+    }
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.tag == Player)
+        {
+            state = EnemyState.Wait;
+        }
     }
     private void Walk()
     {
@@ -71,8 +80,8 @@ public class mikanController : MonoBehaviour
 
         if (state == EnemyState.Walk)
         {
-           
-            transform.position = new Vector3(StartPos + Mathf.PingPong(Time.time, WalkRange), transform.position.y, transform.position.z);
+
+            transform.position = new Vector3(StartPos + Mathf.PingPong(Timer, WalkRange), transform.position.y, transform.position.z);
         }
         else
             return;
@@ -83,7 +92,9 @@ public class mikanController : MonoBehaviour
 
         if (state == EnemyState.Wait)
         {
-           
+            StartPos = transform.position.x;
+            Timer = 0;
+            state = EnemyState.Walk;
         }
         else
             return;
@@ -100,11 +111,4 @@ public class mikanController : MonoBehaviour
             return;
     }
 
-    
-
-    private void OnDestroy()
-    {
-        
-        
-    }
 }

@@ -9,6 +9,8 @@ public class Button_R_Player : MonoBehaviour
     private Button_R_Canvas CanvasScripts;
     public int RandomCount { get; set; }
 
+    public bool TimeStop { get; private set; } = false;
+
     public bool CanvasTrigger { get; private set; }
     // Start is called before the first frame update
     void Start()
@@ -23,11 +25,15 @@ public class Button_R_Player : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.R) && CanvasTrigger == false)
         {
+            TimeStop = true;
+            Time.timeScale = 0;
             CanvasTrigger = true;
             Canvas.SetActive(true);
         }
         else if (Input.GetKeyDown(KeyCode.R) && CanvasTrigger == true)
         {
+            TimeStop = false;
+            Time.timeScale = 1;
             CanvasTrigger = false;
             RandomCount = 0;
             Canvas.SetActive(false);

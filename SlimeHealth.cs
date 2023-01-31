@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class mikanHealth : MonoBehaviour
+
+public class SlimeHealth : MonoBehaviour
 {
-    public float mikanExp { get; private set; }
+    public float SlimeExp { get; private set; }
 
     private GameManager GameM;
 
@@ -18,7 +19,7 @@ public class mikanHealth : MonoBehaviour
 
     void Start()
     {
-        GameM = GameObject.Find("GameManager").GetComponent<GameManager>();
+        GameM = GameObject.Find("GameManager").GetComponent<GameManager>();        
         Hpslider.maxValue = EnemyHp;
     }
 
@@ -29,7 +30,7 @@ public class mikanHealth : MonoBehaviour
 
         if (EnemyHp <= 0)
         {
-            mikanExp += EnemyExp;
+            SlimeExp += EnemyExp;
             Destroy(gameObject);
         }
     }

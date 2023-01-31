@@ -8,6 +8,7 @@ public class Button_R_Canvas : MonoBehaviour
     public string Bullet1 { get; set; }
     public string Bullet2 { get; set; }
     public int ClickCount { get; private set; }
+    
 
     private bool RTrigger_Mein, ShuffingOK;
     private GameObject tmp;
@@ -15,10 +16,10 @@ public class Button_R_Canvas : MonoBehaviour
 
     [SerializeField] private GameObject Player;
     [SerializeField] private GameObject[] BulletList;
-
-    private GameObject[] BulletRandom;
+    
     private Vector2[] PositionList;
-    // Start is called before the first frame update
+    private GameObject[] BulletRandom;
+
     void Start()
     {
         PlayerScripts = Player.GetComponent<Button_R_Player>();
@@ -33,16 +34,10 @@ public class Button_R_Canvas : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
     void Update()
     {
         RTrigger_Mein = PlayerScripts.CanvasTrigger;
 
-        // if (Input.GetKeyDown(KeyCode.Space)) Debug.Log(PositionList[0]);
-    }
-
-    private void FixedUpdate()
-    {
         if (RTrigger_Mein)
         {
             if (PlayerScripts.RandomCount == 0)
@@ -62,6 +57,11 @@ public class Button_R_Canvas : MonoBehaviour
             }
 
         }
+    }
+
+    private void FixedUpdate()
+    {
+        
     }
 
 
