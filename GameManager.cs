@@ -8,16 +8,13 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     private PlayerController PlayerCon;
-    private mikanController mikanCon;
 
     //プレイヤーの攻撃力
     public float PlyerAttckD { get; private set; } = 0.0f;
+
     //プレイヤーの所持経験値
     public float PlayerExp { get; private set; } = 0.0f;
 
-    //敵の攻撃力
-    public float MikanAttackD { get; private set; } = 0.0f;
-    
     //プレイヤーのレベル
     public int PlayerLevel { get; private set; } = 1;
 
@@ -26,7 +23,7 @@ public class GameManager : MonoBehaviour
 
     public static GameManager instance;
 
-    private Text ExpText, NextExpText,LevelText;
+    private Text ExpText, NextExpText, LevelText;
 
     private void Awake()
     {
@@ -43,19 +40,17 @@ public class GameManager : MonoBehaviour
 
         SceneManager.sceneLoaded += OnSceneLoaded;//sceneLoadedに関数を追加
 
-        PlayerCon = GameObject.Find("Player").GetComponent<PlayerController>();
-        mikanCon = GameObject.Find("mikanchan").GetComponent<mikanController>();
+        //PlayerCon = GameObject.Find("Player").GetComponent<PlayerController>();
     }
 
     void Start()
     {
-        MikanAttackD = mikanCon.MikanAttackD;
-        PlyerAttckD = PlayerCon.PlayerAtD;
-        ExpText = GameObject.Find("ExpText").GetComponent<Text>();
-        NextExpText = GameObject.Find("NextExpText").GetComponent<Text>();
-        LevelText = GameObject.Find("LevelText").GetComponent<Text>();
+        //PlyerAttckD = PlayerCon.PlayerAtD;
+        //ExpText = GameObject.Find("ExpText").GetComponent<Text>();
+        //NextExpText = GameObject.Find("NextExpText").GetComponent<Text>();
+        //LevelText = GameObject.Find("LevelText").GetComponent<Text>();
 
-        
+
 
     }
 
@@ -77,6 +72,6 @@ public class GameManager : MonoBehaviour
         LevelText = GameObject.Find("LevelText").GetComponent<Text>();
         PlayerCon = GameObject.Find("Player").GetComponent<PlayerController>();
         Debug.Log("シーンがロードされました");
- 
+
     }
 }
