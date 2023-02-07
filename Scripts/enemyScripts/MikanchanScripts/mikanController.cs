@@ -17,8 +17,9 @@ public class mikanController : MonoBehaviour
 
     [SerializeField] private GameObject Target;
 
+    private int EnemyHori = -1;
     private float StartPos;
-    private float Timer;
+   
 
     private enum EnemyState
     {
@@ -52,7 +53,6 @@ public class mikanController : MonoBehaviour
         Wait();
         Chase();
 
-        Timer += Time.deltaTime;
     }
     private void OnCollisionEnter2D(Collision2D collision)
     {
@@ -81,7 +81,16 @@ public class mikanController : MonoBehaviour
         if (state == EnemyState.Walk)
         {
 
-            transform.position = new Vector3(StartPos + Mathf.PingPong(Timer, WalkRange), transform.position.y, transform.position.z);
+            if (EnemyHori == -1)
+            {
+                transform.rotation = new Quaternion(0.0f, 0.0f, 0.0f, 0.0f); //å¸Ç´ÇïœçXÇ∑ÇÈ
+            }
+            else if (EnemyHori == 1)
+            {
+                transform.rotation = new Quaternion(0.0f, 180.0f, 0.0f, 0.0f); //å¸Ç´ÇïœçXÇ∑ÇÈ
+            }
+
+            Rbody.velocity = new Vector2(EnemyHori * Speed, Rbody.velocity.y);
         }
         else
             return;
@@ -92,8 +101,10 @@ public class mikanController : MonoBehaviour
 
         if (state == EnemyState.Wait)
         {
-            StartPos = transform.position.x;
-            Timer = 0;
+            if (EnemyHori == -1)
+                EnemyHori = 1;
+            else if (EnemyHori == 1)
+                EnemyHori = -1;
             state = EnemyState.Walk;
         }
         else

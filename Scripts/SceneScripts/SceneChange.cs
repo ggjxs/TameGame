@@ -27,7 +27,7 @@ public class SceneChange : MonoBehaviour
         // ロードが完了していても，シーンのアクティブ化は許可しない
         asyncLoad.allowSceneActivation = false;
 
-        // フェードアウト等の何かしらの処理
+        // フェードアウト
         yield return FadeOut();
 
         // ロードが完了したときにシーンのアクティブ化を許可する
@@ -56,7 +56,7 @@ public class SceneChange : MonoBehaviour
     void Start()
     {
         SceneManager.sceneLoaded += OnSceneLoaded;//sceneLoadedに関数を追加
-        Scenecurrent = SceneManager.GetActiveScene().name;
+        
     }
    
 

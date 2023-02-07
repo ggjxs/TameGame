@@ -14,6 +14,7 @@ public class PlayerHealth : MonoBehaviour
     [SerializeField] private float Interval;
     [SerializeField] private float Hp,knockBackPower;//PlayerのHp,ノックバックする力
     [SerializeField] private GameObject GameOverPanel;//フェードパネルの取得
+    [SerializeField] private GameObject ReStartButton;
 
     private Rigidbody2D Rbody;
     private string EnemyName = "Enemy";//敵キャラのtagの名前
@@ -23,6 +24,7 @@ public class PlayerHealth : MonoBehaviour
     [SerializeField] private float flashInterval;
     //点滅させるときのループカウント
     [SerializeField] private int loopCount;
+    [SerializeField] private GameObject GameOverText;
     //点滅させるためのSpriteRenderer
     private SpriteRenderer sp;
     private Slider Hpslider;
@@ -63,12 +65,12 @@ public class PlayerHealth : MonoBehaviour
     {
         for (int i = 0; i < loopCount; i++)
         {
-            Debug.Log("a");
-            Alpha += 0.05f;
-            yield return new WaitForSeconds(Interval);
-            PanelImage.color = new Color(0, 0, 0, Alpha);
+            Alpha += 0.001f;
+            yield return new WaitForSeconds(flashInterval);
+            PanelImage.color = new Color(255, 0, 0, Alpha);
         }
-        
+        yield return new WaitForSeconds(Interval);
+
     }
     private void Awake()
     {
@@ -81,6 +83,8 @@ public class PlayerHealth : MonoBehaviour
     }
     void Start()
     {
+        GameOverText.SetActive(false);
+        ReStartButton.SetActive(false);
         PanelImage = GameOverPanel.GetComponent<Image>();
         PlayerHp = Hp;
         Hpslider.maxValue = PlayerHp;
@@ -98,10 +102,13 @@ public class PlayerHealth : MonoBehaviour
     }
     void FixedUpdate()
     {
+        
         if (PlayerHp <= 0)
         {
             StartCoroutine(GameOver());
-            gameObject.SetActive(false);
+            sp.color = new Color(0, 0, 0, 0);
+            GameOverText.SetActive(true);
+            ReStartButton.SetActive(true);
         }
     }
     private void knockBack()
